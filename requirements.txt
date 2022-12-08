@@ -73,6 +73,7 @@ notebook @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_9
 notebook_shim @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_f8mr1gjfb7/croot/notebook-shim_1668160580414/work
 numpy @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_8efwh7lkf0/croot/numpy_and_numpy_base_1668593730126/work
 oauthlib==3.2.2
+opencv-python==4.6.0.66
 opt-einsum==3.3.0
 packaging @ file:///tmp/build/80754af9/packaging_1637314298585/work
 pandocfilters @ file:///opt/conda/conda-bld/pandocfilters_1643405455980/work
