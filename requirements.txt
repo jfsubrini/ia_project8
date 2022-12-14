@@ -95,6 +95,8 @@ pure-eval @ file:///opt/conda/conda-bld/pure_eval_1646925070566/work
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
+pydot @ file:///Users/ktietz/ci_310/pydot_1643970999479/work
+pydotplus @ file:///tmp/build/80754af9/pydotplus_1594390100614/work
 Pygments @ file:///opt/conda/conda-bld/pygments_1644249106324/work
 pyparsing @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_3b_3vxnd07/croots/recipe/pyparsing_1661452540919/work
 pyrsistent @ file:///Users/ktietz/ci_310/pyrsistent_1643962172005/work
