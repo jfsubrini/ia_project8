@@ -8,8 +8,11 @@ This REST API has been deployed on Heroku.
 ### IMPORTS ###
 # Importation of Python modules and methods.
 import json
+import jsonpickle
 
 # Importation of libraries.
+import cv2
+import numpy as np
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
 import tensorflow as tf
@@ -33,16 +36,29 @@ app = FastAPI()
 # to upload directly the image to generate the respective predictive mask, 
 # in json form.
 @app.post('/')
-async def get_segmentation_map(file: UploadFile = File(...)):
+# async def get_segmentation_map(file: UploadFile = File(...)):
+async def get_segmentation_map(request: Request):
     """Get segmentation maps from image file."""
-    extension = file.filename.split(".")[-1] in ("png")
-    if not extension:
-        return "Image must be png format!"
-    # Predicting the segmentation map (mask).
-    image_bytes = await file.read()
-    image = tf.io.decode_image(image_bytes)
-    prediction = unet_model.predict(tf.expand_dims(image, axis=0))
-    return {"prediction": json.dumps(prediction.tolist())}
+#     # Predicting the segmentation map (mask).
+#     image_bytes = await request.read()
+#     image = tf.io.decode_image(image_bytes)
+#     prediction = unet_model.predict(tf.expand_dims(image, axis=0))
+#     return {"prediction": json.dumps(prediction.tolist())}
+    client_host = request.client.host
+    # convert string of image data to uint8
+    nparr = np.fromstring(r.data, np.uint8)
+    # decode image
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+    # do some fancy processing here....
+
+    # build a response dict to send back to client
+    response = {'message': f'image received of size = {img.shape[1]} x {img.shape[0]}'}
+#     # encode response using jsonpickle
+#     response_pickled = jsonpickle.encode(response)
+
+#     return Response(response=response_pickled, status=200, mimetype="application/json")
+    return Response(response=response, status=200, mimetype="application/json")
 
 
 # Running the API with uvicorn.
