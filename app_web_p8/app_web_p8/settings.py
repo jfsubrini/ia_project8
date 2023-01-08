@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
+# import dj_database_url  # pip install dj_database_url whitenoise
+
 from pathlib import Path
 
 
@@ -24,11 +26,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-%9nys=3oei)f(-fb*771yuv4^=@8h99yrvco-^tb3%g+3v%5%i'
 
+# # SECURITY WARNING: keep the secret key used in production secret!
+# SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-%9nys=3oei)f(-fb*771yuv4^=@8h99yrvco-^tb3%g+3v%5%i')
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+if os.environ.get("ENV") == "PRODUCTION":
+    DEBUG = False
+    ALLOWED_HOSTS = ["ia_project8.herokuapp.com"]
+else:
+    DEBUG = True
+    ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -113,6 +120,8 @@ TIME_ZONE = 'Europe/Madrid'
 
 USE_I18N = True
 
+USE_L10N = True
+
 USE_TZ = True
 
 
@@ -120,6 +129,25 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# if os.environ.get("ENV") == "PRODUCTION":
+
+#     # Static files settings
+#     PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+#     STATIC_ROOT = os.path.join(PROJECT_ROOT, "staticfiles")
+
+#     # Extra places for collectstatic to find static files.
+#     STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, "static"),)
+
+#     # Simplified static file serving.
+#     # https://warehouse.python.org/project/whitenoise/
+#     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+#     # For Heroku to deal with the database.
+#     db_from_env = dj_database_url.config(conn_max_age=500)
+#     DATABASES["default"].update(db_from_env)
+    
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
