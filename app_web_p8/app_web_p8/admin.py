@@ -5,6 +5,8 @@ from django.contrib.admin import AdminSite
 
 class P8Admin(AdminSite):
     """P8 header, site title and index title."""
-    site_header = 'P8 Administration'
-    site_title = 'P8 Site Admin'
-    index_title = 'P8 Site Admin Home'
+    site_header = 'Projet 8 | Administration'
+    site_title = 'Projet 8 | Site Admin'
+    index_title = "Participez à la conception d'une voiture autonome - \
+        Projet 8 | Admin Home"
+    
