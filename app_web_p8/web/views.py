@@ -31,9 +31,18 @@ def semantic_seg_response(request):
 # # decode response.
 # print(json.loads(response.text))
 
-
 # # def post_image(img_file):
 # #     """ post image and return the response """
 # #     img = open(img_file, 'rb').read()
 # #     response = requests.post(URL, data=img, headers=headers)
 # #     return response
+
+# import requests
+# url = "https://frozen-savannah-32709.herokuapp.com/"
+# payload={}
+# path = 'datasets/images/test/berlin/berlin_000000_000019_leftImg8bit.png'
+# files=[('file',(path, open(path,'rb'),'image/png'))]
+# headers = {'accept': 'application/json'}
+# response = requests.request("POST", url, headers=headers, 
+#                             data=payload, files=files)
+# print(response.text)

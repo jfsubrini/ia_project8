@@ -1,4 +1,5 @@
 """app_web_p8 URL Configuration
+Deployed on Heroku at https://ia-project8.herokuapp.com/.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
