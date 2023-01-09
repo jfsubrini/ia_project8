@@ -5,11 +5,12 @@ The page to select an image to send to the REST API.
 The page to display the image sent, the respective ground truth mask and the 
 predicted mask (response from the REST API).
     """
+
+import requests
 from django.contrib import admin
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .models import Image
-
 
 
 # CUSTOM ADMIN ACTIONS TO MAKE THE SEMANTIC SEGMENTATION REQUEST.
@@ -20,8 +21,43 @@ def make_semantic_seg_request(modeladmin, request, queryset):
     """ Admin Action to make a request. 
         Sending a selected image to a REST API.
         Getting the predicted mask response of that image.  
-        Saving this mask into the Image model."""
-    pass
+        Saving this mask into the Image model.
+    """
+    # Getting the id of the selected image in the changing list (or the first one if many).
+    # image_selected_id = request.POST.getlist('_selected_action')[0]
+    # print(image_selected_id)
+    # Getting the actual selected image to be sent in the request.
+    image_selected_path = queryset.first().image
+    print(image_selected_path)
+    # Sending the request to the REST API with the selected image.
+    # URL = "https://ia-project8.herokuapp.com/"
+    # payload={}
+    # path = image_selected
+    # files=[('file', (path, open(path,'rb'), 'image/png'))]
+    # headers = {'accept': 'application/json'}
+    # # Getting the response of the REST API : the predicted mask of the selected image sent.
+    # response = requests.request("POST", URL, headers=headers, 
+    #                                 data=payload, files=files)
+    # # Saving the predicted mask into the Image table, related to the right image.
+    # image_selected_id = Image(title_img=image_selected.title_img)            
+    # mask_pred = Image(mask_pred=response)
+    # mask_pred.save()
+    # # Displaying the new image changing list with the new predicted mask.
+    # return HttpResponseRedirect('/admin')
+
+########################################################################
+# IMAGE & MASK CRUD
+@admin.register(Image)
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ("title_img", "image_preview", 
+                    "title_msk", "mask_preview")
+    ordering = ("title_img",)
+    search_fields = ("title_img",)
+    readonly_fields = ('image_preview', "mask_preview")
+    actions = (make_semantic_seg_request,)
+
+
+########################################################################
 #     # Post the invoiced order line(s).
 #     # if request.method == "POST":
 #     if 0 == 0:  # request.method == "POST"
@@ -55,57 +91,3 @@ def make_semantic_seg_request(modeladmin, request, queryset):
 #                "email": email_selected}
 
 #     return render(request, 'admin/bill.html', context)
-
-
-# CUSTOM ADMIN ACTIONS TO CREATE INITIAL AND FINAL STOCKS INVENTORIES.
-# Initial Bar Stock inventory action from the Bar list page.
-# @admin.action(description='Inventaire du stock initial du bar')
-# def make_bar_initial_stocks(modeladmin, request, queryset):
-#     """ Action pour faire un inventaire du stock initial du bar ; \
-#         envoi vers une page intermédiaire ; enregistrement des données \
-#         dans la table de Stock."""
-#     if "apply" in request.POST:
-#         # Saving the data from the initial bar stock inventory form
-#         # to update the Stock table with those data.
-#         drinks_list = request.POST.getlist('_selected_action')
-#         drink_quantity_list = request.POST.getlist('drink_quantity')
-#         trip_selected = request.POST['trip']
-#         trip_id_selected = Trip.objects.filter(id=trip_selected).last()
-#         i = 0
-#         for drink in drinks_list:
-#             if drink_quantity_list[i]:
-#                 drink_quantity = drink_quantity_list[i]
-#             else:
-#                 drink_quantity = 0
-#             i = i + 1
-#             if drink_quantity != 0:
-#                 drink_id_selected = Bar.objects.filter(id=drink).last()
-#                 bar_initial_item = Stock(bar_initial_id=drink_id_selected,
-#                                          trip_id=trip_id_selected, quantity=drink_quantity,
-#                                          user_id=request.user)
-#                 bar_initial_item.save()
-#         return HttpResponseRedirect('/admin')
-
-#     # To display the stock inventory with all the drinks registered into the database
-#     # with the choice of trips.
-#     else:
-#         all_drinks = queryset.all()
-#         all_trips = Trip.objects.all()
-
-#     # What to render to the template.
-#     all_drinks = queryset.all()
-#     all_trips = Trip.objects.all()
-#     return render(request, 'admin/bar_initial_stocks.html',
-#                   context={"drinks": all_drinks, "trips": all_trips})
-
-
-########################################################################
-# IMAGE & MASK CRUD
-@admin.register(Image)
-class ImageAdmin(admin.ModelAdmin):
-    list_display = ("title_img", "image_preview", 
-                    "title_msk", "mask_preview")
-    ordering = ("title_img",)
-    search_fields = ("title_img",)
-    readonly_fields = ('image_preview', "mask_preview")
-    actions = (make_semantic_seg_request,)

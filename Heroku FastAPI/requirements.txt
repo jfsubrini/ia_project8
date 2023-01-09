@@ -1,7 +1,8 @@
-numpy
-tensorflow
 fastapi
 gunicorn
-uvicorn
-opencv-python
 jsonpickle
+numpy
+opencv-python
+Pillow
+tensorflow
+uvicorn

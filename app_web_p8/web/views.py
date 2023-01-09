@@ -46,3 +46,5 @@ def semantic_seg_response(request):
 # response = requests.request("POST", url, headers=headers, 
 #                             data=payload, files=files)
 # print(response.text)
+
+# return Response(img, mimetype="image/png")

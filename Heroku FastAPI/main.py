@@ -9,15 +9,22 @@ This REST API has been deployed on Heroku at https://ia-api-project8.herokuapp.c
 # Importation of Python modules and methods.
 import json
 import jsonpickle
+import io
 
 # Importation of libraries.
 import cv2
 import numpy as np
 import uvicorn
-from fastapi import FastAPI, File, UploadFile
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-
+from fastapi import (
+    FastAPI, 
+    File, 
+    HTTPException, 
+    Response, 
+    UploadFile, 
+)
+from PIL import Image
 
 ### LOADING MODEL & FASTAPI INSTANCE ###
 # Loading the selected UNET model.
@@ -26,25 +33,38 @@ from tensorflow.keras.models import load_model
 # Creating the app object.
 app = FastAPI()
 
-# # Index route, opens automatically on http://127.0.0.1:8000.
-# @app.get('/')
-# def index():
-#     """Welcome message"""
-#     return {'message': 'This is a semantic segmentation app.'}
+# Index route, opens automatically on http://127.0.0.1:8000.
+# after typing 'uvicorn main:app --reload' in the Terminal.
+@app.get('/')
+def index():
+    """Welcome message"""
+    return {'message': 'This is a semantic segmentation app.'}
 
 # Route to access to the FastAPI swagger, at: http://127.0.0.1:8000/docs,
-# to upload directly the image to generate the respective predictive mask, 
-# in json form.
-@app.post('/')
-# async def get_segmentation_map(file: UploadFile = File(...)):
-async def get_segmentation_map(request: Request):
+# or at: http://127.0.0.1:8000/segmentation_map to upload directly the image 
+# to generate the respective predictive mask, in json form.
+@app.post('/segmentation_map')
+async def get_segmentation_map(file : UploadFile = File(...)):
+# async def get_segmentation_map(file : bytes=File(...)):
+# async def get_segmentation_map(request):
     """Get segmentation maps from image file."""
+    if file.filename.endswith(".png"):
     # Read the image sent by the client (Django website).
-#     image_bytes = await request.read()
-#     response_pickled = jsonpickle.encode(image_bytes)
-#     return Response(response=response_pickled, status=200, mimetype="application/json")   
-      return Response(response={"name": request.filename})   
-
+        image_bytes = await file.read()
+    #     response_pickled = jsonpickle.encode(image_bytes)
+        image = Image.open(io.BytesIO(image_bytes))
+    #     return Response(response=response_pickled, status=200, mimetype="application/json")
+        # Read the bytes file sent by the client (Django website) and transform it into an image.
+    #     image = Image.open(io.BytesIO(file))
+        image.show()
+    #     response_pickled = jsonpickle.encode(file)
+        response = {"file_name": file.filename}
+        return response
+    else:
+        raise HTTPException(
+            400, detail="Invalid file or format type (needs .png image)")
+    
+#     return Response(response=response_pickled, status=200, mimetype="application/json")
 #     # Predicting the segmentation map (mask).
 #     image = tf.io.decode_image(image_bytes)
 #     prediction = unet_model.predict(tf.expand_dims(image, axis=0))
