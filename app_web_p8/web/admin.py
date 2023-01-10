@@ -23,25 +23,27 @@ def make_semantic_seg_request(modeladmin, request, queryset):
         Getting the predicted mask response of that image.  
         Saving this mask into the Image model.
     """
-    # Getting the id of the selected image in the changing list (or the first one if many).
-    # image_selected_id = request.POST.getlist('_selected_action')[0]
-    # print(image_selected_id)
     # Getting the actual selected image to be sent in the request.
-    image_selected_path = queryset.first().image
-    print(image_selected_path)
+    image_selected = queryset.first().image
     # Sending the request to the REST API with the selected image.
-    # URL = "https://ia-project8.herokuapp.com/"
-    # payload={}
-    # path = image_selected
-    # files=[('file', (path, open(path,'rb'), 'image/png'))]
-    # headers = {'accept': 'application/json'}
+    # You can directly post binary image to the server using the files parameter of requests.post():
+    # URL = "https://ia-api-project8.herokuapp.com/"
+    URL = "http://127.0.0.1:8080/segmentation_map/"
+    my_img = {'file': open('./media/' + str(image_selected), 'rb')}
+    response = requests.post(URL, files=my_img)
+    # # convert server response into JSON format.
+
     # # Getting the response of the REST API : the predicted mask of the selected image sent.
-    # response = requests.request("POST", URL, headers=headers, 
-    #                                 data=payload, files=files)
-    # # Saving the predicted mask into the Image table, related to the right image.
-    # image_selected_id = Image(title_img=image_selected.title_img)            
-    # mask_pred = Image(mask_pred=response)
-    # mask_pred.save()
+    
+    # Saving the predicted mask into the Image table, related to the right image, and its title.
+    image_selected_mask_name = queryset.first().title_msk
+    title_pred = image_selected_mask_name + "_pred"
+    image_selected_id = queryset.first().id
+    img = Image.objects.get(id=image_selected_id)
+    img.title_prediction = title_pred
+    # img.mask_pred = response ???
+    # img.save(update_fields=['mask_pred', 'title_prediction'])
+    
     # # Displaying the new image changing list with the new predicted mask.
     # return HttpResponseRedirect('/admin')
 
@@ -50,28 +52,16 @@ def make_semantic_seg_request(modeladmin, request, queryset):
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
     list_display = ("title_img", "image_preview", 
-                    "title_msk", "mask_preview")
+                    "title_msk", "mask_preview",
+                    "title_prediction", "pred_mask_preview")
     ordering = ("title_img",)
     search_fields = ("title_img",)
-    readonly_fields = ('image_preview', "mask_preview")
+    readonly_fields = ('image_preview', "mask_preview", 
+                       "pred_mask_preview")
     actions = (make_semantic_seg_request,)
 
 
 ########################################################################
-#     # Post the invoiced order line(s).
-#     # if request.method == "POST":
-#     if 0 == 0:  # request.method == "POST"
-#         # if request.POST.get('post'):  TODO
-#         # Create the bill instance with the total amount to pay and the user_id
-#         new_bill = Bill(user_id=request.user, amount=total_amount)
-#         new_bill.save()
-#         # Send the bill to the guest's email address.
-#         emailto = queryset.first().guest_id.email
-#         guest_name = f"{queryset.first().guest_id.first_name} {queryset.first().guest_id.last_name}"
-#         formatted_total_amount = f"{total_amount:.2f}"
-#         send_email(emailto, guest_name, formatted_total_amount)
-#         # send_email(["lea@vaiatea-liveaboard.com", "william@dragondivekomodo.com"])
-#         # Collecting all the guest's order line(s) selected.
 #         orderline_list = request.POST.getlist('_selected_action')
 #         # Put the new bill id created in the invoiced order line(s) instance(s).
 #         for orderline in orderline_list:
@@ -80,14 +70,3 @@ class ImageAdmin(admin.ModelAdmin):
 #             bill_id = Bill.objects.filter(id=new_bill.id).last()
 #             orderline_selected.bill_id = bill_id
 #             orderline_selected.save()
-#         return HttpResponseRedirect('/admin')
-
-#     # What to render to the intermediate django admin/bill action template.
-#     zipped_data = zip(all_orderlines, all_amounts)
-#     email_selected = all_orderlines[0].guest_id.email
-#     context = {"orderlines": all_orderlines,
-#                "zipped_data": zipped_data,
-#                "total_amount": total_amount,
-#                "email": email_selected}
-
-#     return render(request, 'admin/bill.html', context)
