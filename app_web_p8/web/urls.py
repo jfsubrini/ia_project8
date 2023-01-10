@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
+"""web URL Configuration
 """
-schedule URL Configuration
-"""
-from django.contrib import admin
-from django.urls import path
+# from django.contrib import admin
+# from django.urls import path
 
 
 urlpatterns = [

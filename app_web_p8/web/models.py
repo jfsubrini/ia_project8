@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=too-few-public-methods,missing-class-docstring
-"""The Image model to store images and respective mask.
+# pylint: disable=too-few-public-methods,no-member,missing-class-docstring
+"""The Image model to store images, respective mask and
+the predictive mask to get from the REST API.
 """
-from django.conf import settings
 from django.db import models
 from django.utils.html import mark_safe
 
@@ -11,8 +11,8 @@ class Image(models.Model):
     """
     To create the Image table in the database.
     Gathering some images and the related mask of the Cityscapes Dataset.
+    Storing the predictive mask requested to the REST API.
     """
-
     title_img = models.CharField(
         "Titre de l'image", max_length=50, unique=True)
     image = models.ImageField(upload_to='images')
@@ -20,11 +20,10 @@ class Image(models.Model):
         "Titre du mask", max_length=50, unique=True )
     mask = models.ImageField(upload_to='masks')
     title_prediction = models.CharField(
-        "Titre de la prédiction", max_length=50, 
-        unique=True, blank=True, null=True)
+        "Titre de la prédiction", max_length=50, unique=True, blank=True, null=True)
     mask_pred = models.ImageField(
         upload_to='prediction', blank=True, null=True)
-    
+
     def image_preview(self):
         """Displaying the image, size 180x360."""
         return mark_safe(f'<img src="{self.image.url}" width="360" height="180"/>')
@@ -38,7 +37,7 @@ class Image(models.Model):
         if self.mask_pred:
             return mark_safe(f'<img src="{self.mask_pred.url}" width="360" height="180"/>')
         return None
-    
+
     class Meta:
         verbose_name = "Image & Mask storing"
 
