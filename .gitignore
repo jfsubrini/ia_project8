@@ -26,6 +26,7 @@ env_p8/
 # Datasets
 datasets/
 original/
+dataset1/
 
 # VS Code
 .vscode
