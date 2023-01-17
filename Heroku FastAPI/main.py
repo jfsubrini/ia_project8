@@ -24,6 +24,8 @@ from fastapi import (
     Response, 
     UploadFile, 
 )
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from PIL import Image
 
 ### LOADING MODEL & FASTAPI INSTANCE ###
@@ -45,21 +47,22 @@ def index():
 # to generate the respective predictive mask, in json form.
 @app.post('/segmentation_map')
 async def get_segmentation_map(file : UploadFile = File(...)):
-# async def get_segmentation_map(file : bytes=File(...)):
-# async def get_segmentation_map(request):
     """Get segmentation maps from image file."""
     if file.filename.endswith(".png"):
     # Read the image sent by the client (Django website).
         image_bytes = await file.read()
-    #     response_pickled = jsonpickle.encode(image_bytes)
-        image = Image.open(io.BytesIO(image_bytes))
-    #     return Response(response=response_pickled, status=200, mimetype="application/json")
-        # Read the bytes file sent by the client (Django website) and transform it into an image.
-    #     image = Image.open(io.BytesIO(file))
-        image.show()
-    #     response_pickled = jsonpickle.encode(file)
-        response = {"file_name": file.filename}
-        return response
+        # Encoding the response using jsonpickle.
+        response_pickled = jsonpickle.encode(image_bytes)
+        
+#         response_pickled = jsonpickle.encode(file)  # OU BIEN CELUI-LA
+
+#         return Response(content=image_bytes, media_type='application/json')  # OU BIEN CA
+
+#         result = {'meta': {'status': 200}, 'data': file}
+#         content = jsonable_encoder(result)
+#         return JSONResponse(content=content)  # OU BIEN CA
+
+        return Response(content=response_pickled, media_type='application/json')
     else:
         raise HTTPException(
             400, detail="Invalid file or format type (needs .png image)")
@@ -75,13 +78,12 @@ async def get_segmentation_map(file : UploadFile = File(...)):
 #     # decode image
 #     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-# Building a response dictionary to send back to client.
-#     response = {'message': image_bytes}
-#     # encode response using jsonpickle
-#     response_pickled = jsonpickle.encode(response)
-#     return Response(response=response_pickled, status=200, mimetype="application/json")
-#     return Response(response=response, status=200, mimetype="application/json")
 
+#         image = Image.open(io.BytesIO(image_bytes))
+        # Read the bytes file sent by the client (Django website) and transform it into an image.
+    #     image = Image.open(io.BytesIO(file))
+#         image.show()
+#         return Response(response=response_pickled, status=200, mimetype="application/json")
 
 # Running the API with uvicorn.
 # Will run on http://127.0.0.1:8000
