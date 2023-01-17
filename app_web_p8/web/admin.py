@@ -6,6 +6,7 @@ The page to display the image sent, the respective ground truth mask and the
 predicted mask (response from the REST API).
     """
 
+import json
 import requests
 from django.contrib import admin
 # from django.http import HttpResponseRedirect
@@ -42,8 +43,11 @@ def make_semantic_seg_request(modeladmin, request, queryset):
     image_selected_id = queryset.first().id
     img = Image.objects.get(id=image_selected_id)
     img.title_prediction = title_pred
-    img.mask_pred = response.json()["file_name"]
-    img.save(update_fields=['mask_pred', 'title_prediction'])
+    # Decoding the json response.
+    json_resp = json.loads(response)
+    print(json_resp)
+    # img.mask_pred = json_resp
+    # img.save(update_fields=['mask_pred', 'title_prediction'])
 
     # # Displaying the new image changing list with the new predicted mask.
     # return HttpResponseRedirect('/admin')
