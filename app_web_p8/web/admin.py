@@ -25,27 +25,30 @@ def make_semantic_seg_request(modeladmin, request, queryset):
     """
     # Getting the actual selected image to be sent in the request.
     image_selected = queryset.first().image
+    print("image_selected ", image_selected)
+    print(str(image_selected).removeprefix('image/'))
     # Sending the request to the REST API with the selected image.
     # You can directly post binary image to the server using the files parameter of requests.post():
     # URL = "https://ia-api-project8.herokuapp.com/"
     URL = "http://127.0.0.1:8080/segmentation_map/"
-    with open('./media/' + str(image_selected), 'rb') as file_handle:
-    # my_img = {'file': open('./media/' + str(image_selected), 'rb')}
-        my_img = {'file': file_handle}
-        response = requests.post(URL, files=my_img, timeout=10)
+    # with open('./media/' + str(image_selected), 'rb') as file_handle:
+    files = [('file', ('myfile.png', open('./media/' + str(image_selected), 'rb'), 'image/png'))]
+    response = requests.post(URL, files=files, timeout=10)
+    print("response : ", response.text)
+    
     # # convert server response into JSON format.
-
+    print(response.json())    
     # # Getting the response of the REST API : the predicted mask of the selected image sent.
 
     # Saving the predicted mask into the Image table, related to the right image, and its title.
-    image_selected_mask_name = queryset.first().title_msk
-    title_pred = image_selected_mask_name + "_pred"
-    image_selected_id = queryset.first().id
-    img = Image.objects.get(id=image_selected_id)
-    img.title_prediction = title_pred
-    # Decoding the json response.
-    json_resp = json.loads(response)
-    print(json_resp)
+    # image_selected_mask_name = queryset.first().title_msk
+    # title_pred = image_selected_mask_name + "_pred"
+    # image_selected_id = queryset.first().id
+    # img = Image.objects.get(id=image_selected_id)
+    # img.title_prediction = title_pred
+    # # Decoding the json response.
+    # json_resp = json.loads(response)
+    # print(json_resp)
     # img.mask_pred = json_resp
     # img.save(update_fields=['mask_pred', 'title_prediction'])
 
@@ -67,15 +70,6 @@ class ImageAdmin(admin.ModelAdmin):
 
 
 ########################################################################
-#         orderline_list = request.POST.getlist('_selected_action')
-#         # Put the new bill id created in the invoiced order line(s) instance(s).
-#         for orderline in orderline_list:
-#             orderline_selected = OrderLine.objects.filter(
-#                 id=orderline).last()
-#             bill_id = Bill.objects.filter(id=new_bill.id).last()
-#             orderline_selected.bill_id = bill_id
-#             orderline_selected.save()
-
 # URL = 'http://localhost:8000/'
 # # prepare headers for http request.
 # headers = {'content-type': 'image/png'}
