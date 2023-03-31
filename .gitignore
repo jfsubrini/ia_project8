@@ -23,10 +23,10 @@ env/
 venv/
 env_p8/
 
-# Datasets
+# Datasets and models
 datasets/
-original/
-dataset1/
+models/
+checkpoint/
 
 # VS Code
 .vscode

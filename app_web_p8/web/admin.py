@@ -9,7 +9,7 @@ predicted mask (response from the REST API).
 import json
 import requests
 from django.contrib import admin
-# from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from .models import Image
 
 
@@ -25,35 +25,32 @@ def make_semantic_seg_request(modeladmin, request, queryset):
     """
     # Getting the actual selected image to be sent in the request.
     image_selected = queryset.first().image
-    print("image_selected ", image_selected)
-    print(str(image_selected).removeprefix('image/'))
+    # print("image_selected ", image_selected)
+    # print(str(image_selected).removeprefix('image/'))
     # Sending the request to the REST API with the selected image.
     # You can directly post binary image to the server using the files parameter of requests.post():
     # URL = "https://ia-api-project8.herokuapp.com/"
     URL = "http://127.0.0.1:8080/segmentation_map/"
     # with open('./media/' + str(image_selected), 'rb') as file_handle:
-    files = [('file', ('myfile.png', open('./media/' + str(image_selected), 'rb'), 'image/png'))]
-    response = requests.post(URL, files=files, timeout=10)
-    print("response : ", response.text)
-    
+    file = [('file', ('myfile.png', open('./media/' + str(image_selected), 'rb'), 'image/png'))]
+    response = requests.post(URL, files=file, timeout=10)
     # # convert server response into JSON format.
-    print(response.json())    
+    # resp = response.json()
     # # Getting the response of the REST API : the predicted mask of the selected image sent.
 
     # Saving the predicted mask into the Image table, related to the right image, and its title.
-    # image_selected_mask_name = queryset.first().title_msk
-    # title_pred = image_selected_mask_name + "_pred"
-    # image_selected_id = queryset.first().id
-    # img = Image.objects.get(id=image_selected_id)
-    # img.title_prediction = title_pred
-    # # Decoding the json response.
-    # json_resp = json.loads(response)
-    # print(json_resp)
-    # img.mask_pred = json_resp
-    # img.save(update_fields=['mask_pred', 'title_prediction'])
+    image_selected_mask_name = queryset.first().title_msk
+    title_pred = image_selected_mask_name + "_pred"
+    image_selected_id = queryset.first().id
+    img = Image.objects.get(id=image_selected_id)
+    img.title_prediction = title_pred
+    # Decoding the json response.
+    json_resp = json.loads(response.json())
+    img.mask_pred = json_resp
+    img.save(update_fields=['mask_pred', 'title_prediction'])  # TODO
 
-    # # Displaying the new image changing list with the new predicted mask.
-    # return HttpResponseRedirect('/admin')
+    # Displaying the new image changing list with the new predicted mask.
+    return HttpResponseRedirect('/admin')
 
 ########################################################################
 # IMAGE & MASK CRUD
@@ -67,34 +64,3 @@ class ImageAdmin(admin.ModelAdmin):
     readonly_fields = ('image_preview', "mask_preview",
                        "pred_mask_preview")
     actions = (make_semantic_seg_request,)
-
-
-########################################################################
-# URL = 'http://localhost:8000/'
-# # prepare headers for http request.
-# headers = {'content-type': 'image/png'}
-# img = cv2.imread('image_test.png')
-# # encode image as png.
-# _, img_encoded = cv2.imencode('.png', img)
-# # send http request with image and receive response.
-# response = requests.post(URL, data=img_encoded.tostring(), headers=headers)
-# # decode response.
-# print(json.loads(response.text))
-
-# # def post_image(img_file):
-# #     """ post image and return the response """
-# #     img = open(img_file, 'rb').read()
-# #     response = requests.post(URL, data=img, headers=headers)
-# #     return response
-
-# import requests
-# url = "https://frozen-savannah-32709.herokuapp.com/"
-# payload={}
-# path = 'datasets/images/test/berlin/berlin_000000_000019_leftImg8bit.png'
-# files=[('file',(path, open(path,'rb'),'image/png'))]
-# headers = {'accept': 'application/json'}
-# response = requests.request("POST", url, headers=headers,
-#                             data=payload, files=files)
-# print(response.text)
-
-# return Response(img, mimetype="image/png")
