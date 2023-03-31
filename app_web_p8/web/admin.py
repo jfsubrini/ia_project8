@@ -11,6 +11,10 @@ import requests
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from .models import Image
+from PIL import Image as im
+import numpy as np
+import cv2
+from django.core.files.base import ContentFile
 
 
 # CUSTOM ADMIN ACTIONS TO MAKE THE SEMANTIC SEGMENTATION REQUEST.
@@ -45,8 +49,12 @@ def make_semantic_seg_request(modeladmin, request, queryset):
     img = Image.objects.get(id=image_selected_id)
     img.title_prediction = title_pred
     # Decoding the json response.
+    # json_resp = response.json()
     json_resp = json.loads(response.json())
-    img.mask_pred = json_resp
+    resp_array = np.array(json_resp)
+    img_gg = im.fromarray(resp_array.astype(np.uint8))
+    img_gg.show()
+    img.mask_pred = img_gg
     img.save(update_fields=['mask_pred', 'title_prediction'])  # TODO
 
     # Displaying the new image changing list with the new predicted mask.
