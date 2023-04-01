@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=no-member,import-error
 """
-Created by Jean-François Subrini on the 12th of January 2023.
+Created by Jean-François Subrini on the 1st of April 2023.
 Creation of a semantic segmentation REST API using the FastAPI framework
 and a U-NET model (created in the Notebook 1 Scripts).
 This REST API has been deployed on Heroku at https://ia-api-project8.herokuapp.com/.
@@ -9,25 +10,19 @@ This REST API has been deployed on Heroku at https://ia-api-project8.herokuapp.c
 # Importation of Python modules and methods.
 import json
 from io import BytesIO
-# import jsonpickle
-
 # Importation of libraries.
 import cv2
 import numpy as np
 import uvicorn
 from PIL import Image
-
 # import tensorflow as tf
 from tensorflow.keras.models import load_model
 from fastapi import (
     FastAPI,
     File,
     HTTPException,
-    # Response,
     UploadFile,
 )
-# from fastapi.responses import JSONResponse
-# from fastapi.encoders import jsonable_encoder
 
 
 ### LOADING MODEL & PREDICTION FUNCTIONS ###
@@ -36,7 +31,6 @@ unet_model = load_model('model_unet_dice_loss_tuning', compile=False)
 # Image size.
 IMG_HEIGHT = 256
 IMG_WIDTH = 512
-
 
 def get_colored(pred_mask, n_classes):
     """Function to get the prediction mask colored as wanted
@@ -65,8 +59,8 @@ def get_colored(pred_mask, n_classes):
     return pred_mask_c.astype('uint8')
 
 def mask_prediction(model, img_to_predict):
-    """Function that make the mask prediction with an image.
-    Printing of the image, the ground truth mask and the colored prediction mask."""
+    """Function that makes, with a model, the mask prediction of an image.
+    """
     img_resized = cv2.resize(img_to_predict, (IMG_WIDTH, IMG_HEIGHT))
     pred_mask = model.predict(np.expand_dims(img_resized, axis=0))
     pred_mask = np.argmax(pred_mask, axis=-1)
@@ -76,17 +70,19 @@ def mask_prediction(model, img_to_predict):
 
     return pred_mask_colored
 
-def load_image_into_numpy_array(file):
+def load_img_into_np_array(img):
     """Reading the bytes file sent by the client (Django website) and transform it
     into numpy array."""
-    return np.array(Image.open(BytesIO(file)))
+    return np.array(Image.open(BytesIO(img)))
 
-### FASTAPI INSTANCE ###
+
+### FASTAPI INSTANCE FOR IMAGE SEMANTIC SEGMENTATION ###
 # Creating the app object.
 app = FastAPI()
 
-# Index route, opens automatically on http://127.0.0.1:8080.
-# after typing 'uvicorn main:app --port 8080 --reload' in the Terminal.
+# Index route, opens automatically on http://127.0.0.1:8000.
+# after typing 'uvicorn main:app --reload' in the Terminal.
+# or http://127.0.0.1:8080 with 'uvicorn main:app --reload --port 8080' if Django client.
 @app.get('/')
 def index():
     """Welcome message"""
@@ -102,40 +98,16 @@ async def get_segmentation_map(file : UploadFile = File(...)):
         # Reading the image sent by the client (Django website).
         image_from_client = await file.read()
         # Preparing the image for prediction.
-        img_to_predict = load_image_into_numpy_array(image_from_client) / 255.0
+        img_to_predict = load_img_into_np_array(image_from_client) / 255.0
         # Predicting the mask.
         pred_mask_colored = mask_prediction(unet_model, img_to_predict)
+        # Returning the mask as a json string.
         return json.dumps(pred_mask_colored.tolist())
 
-        # Encoding the response using jsonpickle.
-        # response_pickled = jsonpickle.encode(pred_mask_colored)
-        # return Response(content=response_pickled, media_type='application/json')
-
-        # img_to_predict = file.file.read()
-        # with open(file.filename, 'wb') as f:
-        #     f.write(img_to_predict)
-        #     # Predicting the segmentation map (mask).
-        #     to_predict = img_to_array(f) / 255.0
-        #     pred_mask_colored = mask_prediction(unet_model, to_predict)
     except HTTPException:
         return {"message": "There was an error uploading the file"}
     finally:
         file.file.close()
-    return {"message": f"Successfuly uploaded {file.filename}"}
-
-
-
-#     return Response(response=response_pickled, status=200, mimetype="application/json")
-#     # Predicting the segmentation map (mask).
-#     image = tf.io.decode_image(image_bytes)
-#     prediction = unet_model.predict(tf.expand_dims(image, axis=0))
-#     return {"prediction": json.dumps(prediction.tolist())}
-#     client_host = request.client.host
-#     # convert string of image data to uint8
-#     nparr = np.fromstring(r.data, np.uint8)
-#     # decode image
-#     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
 
 # Running the API with uvicorn.
 # Will run on http://127.0.0.1:8000

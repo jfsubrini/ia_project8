@@ -1,6 +1,5 @@
 fastapi
 gunicorn
-jsonpickle
 numpy
 opencv-python
 Pillow
