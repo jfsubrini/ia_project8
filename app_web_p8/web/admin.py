@@ -7,14 +7,13 @@ predicted mask (response from the REST API).
     """
 
 import json
+import os
+import numpy as np
 import requests
 from django.contrib import admin
 from django.http import HttpResponseRedirect
-from .models import Image
 from PIL import Image as im
-import numpy as np
-import cv2
-from django.core.files.base import ContentFile
+from .models import Image
 
 
 # CUSTOM ADMIN ACTIONS TO MAKE THE SEMANTIC SEGMENTATION REQUEST.
@@ -25,48 +24,51 @@ def make_semantic_seg_request(modeladmin, request, queryset):
     """ Admin Action to make a request.
         Sending a selected image to a REST API.
         Getting the predicted mask response of that image.
-        Saving this mask into the Image model.
+        Saving this predicted mask into the Image model.
+        Displaying the new predicted mask inside the page, near the corresponding ground truth mask.
     """
     # Getting the actual selected image to be sent in the request.
     image_selected = queryset.first().image
-    # print("image_selected ", image_selected)
-    # print(str(image_selected).removeprefix('image/'))
-    # Sending the request to the REST API with the selected image.
-    # You can directly post binary image to the server using the files parameter of requests.post():
-    # URL = "https://ia-api-project8.herokuapp.com/"
-    URL = "http://127.0.0.1:8080/segmentation_map/"
-    # with open('./media/' + str(image_selected), 'rb') as file_handle:
+
+    # Sending the selected binary image to the REST API with the files parameter of requests.post().
+    if os.environ.get("ENV") == "PRODUCTION":
+        URL = "https://ia-api-project8.herokuapp.com/"
+    else:
+        URL = "http://127.0.0.1:8080/segmentation_map/"
     file = [('file', ('myfile.png', open('./media/' + str(image_selected), 'rb'), 'image/png'))]
     response = requests.post(URL, files=file, timeout=10)
-    # # convert server response into JSON format.
-    # resp = response.json()
-    # # Getting the response of the REST API : the predicted mask of the selected image sent.
 
-    # Saving the predicted mask into the Image table, related to the right image, and its title.
+    # Converting the REST API response into JSON format.
+    json_resp = response.json()
+
+    # Decoding the json response into a numpy array with shape (256, 512, 3).
+    resp_array = np.array(json.loads(json_resp))
+
+    # Transforming the numpy array into a PIL Image.
+    msk_pred = im.fromarray(resp_array.astype(np.uint8))
+
+    # Saving the predicted mask into the media/prediction directory.
     image_selected_mask_name = queryset.first().title_msk
     title_pred = image_selected_mask_name + "_pred"
+    msk_pred.save(f"./media/prediction/{title_pred}.png")
+
+    # Saving the predicted mask (path) and title into the Image table.
     image_selected_id = queryset.first().id
     img = Image.objects.get(id=image_selected_id)
     img.title_prediction = title_pred
-    # Decoding the json response.
-    # json_resp = response.json()
-    json_resp = json.loads(response.json())
-    resp_array = np.array(json_resp)
-    img_gg = im.fromarray(resp_array.astype(np.uint8))
-    img_gg.show()
-    img.mask_pred = img_gg
-    img.save(update_fields=['mask_pred', 'title_prediction'])  # TODO
+    img.mask_pred = f"prediction/{title_pred}.png"
+    img.save(update_fields=['title_prediction', 'mask_pred'])
 
     # Displaying the new image changing list with the new predicted mask.
-    return HttpResponseRedirect('/admin')
+    return HttpResponseRedirect('/admin/web/image')
 
 ########################################################################
-# IMAGE & MASK CRUD
+# IMAGE & MASK CRUD.
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
     list_display = ("title_img", "image_preview",
-                    "title_msk", "mask_preview",
-                    "title_prediction", "pred_mask_preview")
+                    "mask_preview",
+                    "pred_mask_preview")
     ordering = ("title_img",)
     search_fields = ("title_img",)
     readonly_fields = ('image_preview', "mask_preview",
