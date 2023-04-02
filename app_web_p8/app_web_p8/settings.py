@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 import dj_database_url
 
 
@@ -25,10 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%9nys=3oei)f(-fb*771yuv4^=@8h99yrvco-^tb3%g+3v%5%i'
-
-# # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-%9nys=3oei)f(-fb*771yuv4^=@8h99yrvco-^tb3%g+3v%5%i')
+load_dotenv()
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY', 'django-insecure-%9nys=3oei)f(-fb*771yuv4^=@8h99yrvco-^tb3%g+3v%5%i')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ.get("ENV") == "PRODUCTION":
@@ -151,12 +151,12 @@ if os.environ.get("ENV") == "PRODUCTION":
     db_from_env = dj_database_url.config(conn_max_age=500)
     DATABASES["default"].update(db_from_env)
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Place to store the uploaded images and masks.
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
