@@ -1,7 +1,8 @@
 fastapi
 gunicorn
 numpy
-opencv-python
+opencv-python-headless  # because of Heroku instead of only opencv-python
+python-multipart  # because of Heroku instead of only opencv-python 
 Pillow
 tensorflow
 uvicorn
