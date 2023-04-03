@@ -153,3 +153,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Place to store the uploaded images and masks.
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# A list of trusted origins for unsafe requests.
+CSRF_TRUSTED_ORIGINS = ['https://ia-projet8.herokuapp.com']
