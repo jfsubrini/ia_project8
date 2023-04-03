@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=unused-argument,no-member,invalid-name,missing-class-docstring
+# pylint: disable=unused-argument,no-member,invalid-name,missing-class-docstring,consider-using-with
 """The admin page to add, modify and delete images and respective masks.
 The page to select an image to send to the REST API.
 The page to display the image sent, the respective ground truth mask and the

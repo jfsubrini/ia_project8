@@ -126,6 +126,7 @@ PyQt5-sip==12.11.0
 pyrsistent @ file:///Users/ktietz/ci_310/pyrsistent_1643962172005/work
 PySocks @ file:///Users/ktietz/ci_310/pysocks_1643961536721/work
 python-dateutil @ file:///tmp/build/80754af9/python-dateutil_1626374649649/work
+python-dotenv==1.0.0
 python-multipart==0.0.5
 pytz @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_c56ru3yml9/croot/pytz_1671697451306/work
 PyWavelets==1.4.1
