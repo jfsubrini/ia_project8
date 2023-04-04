@@ -32,9 +32,10 @@ def make_semantic_seg_request(modeladmin, request, queryset):
 
     # Sending the selected binary image to the REST API with the files parameter of requests.post().
     if os.environ.get("ENV") == "PRODUCTION":
-        URL = "https://ia-api-project8.herokuapp.com/"
+        URL = "https://ia-api-project8.herokuapp.com/segmentation_map/"
     else:
         URL = "http://127.0.0.1:8080/segmentation_map/"
+
     file = [('file', ('myfile.png', open('./media/' + str(image_selected), 'rb'), 'image/png'))]
     response = requests.post(URL, files=file, timeout=10)
 

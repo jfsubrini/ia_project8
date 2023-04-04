@@ -1,4 +1,6 @@
 FROM python:3.10.8
+# Environment variable set for production.
+ENV ENV PRODUCTION
 # Setting work directory.
 WORKDIR /app
 COPY . /app

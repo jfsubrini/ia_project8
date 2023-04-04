@@ -20,9 +20,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('web/', include('web.urls'))
+    path('', admin.site.urls),  # opening directly on the admin page.
+    path('web/', include('web.urls')),
 ]
 
 # To see the images in debug mode.
