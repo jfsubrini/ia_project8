@@ -1,5 +1,6 @@
 """app_web_p8 URL Configuration
 Deployed on Heroku at https://ia-project8.herokuapp.com/.
+On line open with https://ia-project8.herokuapp.com/admin/ to access the admin page.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -22,7 +23,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('', admin.site.urls),  # opening directly on the admin page.
+    path('admin/', admin.site.urls),
     path('web/', include('web.urls')),
 ]
 

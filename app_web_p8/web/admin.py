@@ -61,7 +61,7 @@ def make_semantic_seg_request(modeladmin, request, queryset):
     img.save(update_fields=['title_prediction', 'mask_pred'])
 
     # Displaying the new image changing list with the new predicted mask.
-    return HttpResponseRedirect('/admin/web/image')
+    return HttpResponseRedirect('admin/web/image')
 
 ########################################################################
 # IMAGE & MASK CRUD.
